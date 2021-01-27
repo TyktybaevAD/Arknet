@@ -1,0 +1,1448 @@
+{% extends 'base_search_history.html' %}
+{% block content %}
+
+{% verbatim %}
+
+
+
+<div id="app_search_history">
+    <div class="div_search_histor">
+        <div id="search_histor">
+            <div class="container_histor">
+                <div class="search_histor">
+                    <div class="container">
+                        <div v-if='!v_check_history' class="alert alert-danger text-center" role="alert">
+                            Введите номер истории
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2"></div>
+                            <div class="col-md-6">
+                                <input class="form-control mr-sm-2" type="text" placeholder="Введите номер истории"
+                                    v-model='v_search_history' v-on:keyup.enter="get_history">
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-outline-success my-2 my-sm-0" type="submit"
+                                    @click="get_history">Поиск</button>
+                            </div>
+                            <div class="col-md-2"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="search_history_table">
+                    <div class="container">
+                        <div class="row">
+                            <template v-if="v_check_response_history">
+
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">История</th>
+                                            <th scope="col">Фамилия</th>
+                                            <th scope="col">Имя</th>
+                                            <th scope="col">Отчество</th>
+                                            <th scope="col">Дата рождения</th>
+                                            <th scope="col">Дата поступления</th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(h,index) in v_response_history">
+                                            <!-- <th scope="row">1</th> -->
+                                            <td>{{index+1}}</td>
+                                            <td>{{h['nhistory']}}</td>
+                                            <td>{{h['fam']}}</td>
+                                            <td>{{h['im']}}</td>
+                                            <td>{{h['ot']}}</td>
+                                            <td>{{h['dr']}}</td>
+                                            <td>{{h['date_z_1']}}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-info" data-toggle="modal"
+                                                    data-target="#exampleModal" :value="h['nhistory']"
+                                                    :date_z_1="h['date_z_1']" onclick="Get_data_cards()">
+                                                    История
+                                                </button>
+                                                <!-- @click="(h['nhistory'])" -->
+                                                <!-- onclick="getH(event)" -->
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal_history"></div>
+    <div id="content">
+        <div class="modal fade" id="exampleModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+            role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Карта пациента {{v_history}}</h5>
+                        <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true" onclick="Clear()">&times;</span>
+                        </button> -->
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true" onclick="Clear()">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="flex-content">
+                            <div class="med-card">
+                                <div class="med-card-pacienta-header">
+                                    <div class="flex-content mb-2">
+                                        <div class="header-left">
+                                            <div class="fam-div mt-2 ml-3">
+                                                <div class="d-flex justify-content-between">
+                                                    <label class="mr-2">7.Фамилия</label>
+                                                    <input type="text" class="control_input text-center"
+                                                        v-model="v_fam">
+
+                                                </div>
+                                            </div>
+                                            <div class="im-div mt-2 ml-3">
+                                                <div class="d-flex justify-content-between">
+                                                    <label>Имя</label>
+                                                    <input type="text" class="control_input text-center" v-model="v_im">
+                                                </div>
+                                            </div>
+                                            <div class="ot-div mt-2 ml-3">
+                                                <div class="d-flex justify-content-between">
+                                                    <label>Отчество</label>
+                                                    <input type="text" class="control_input text-center" v-model="v_ot">
+                                                </div>
+                                            </div>
+                                            <div class="pol-div mt-2 ml-3">
+                                                <div class="d-flex justify-content-between">
+                                                    <label>Пол</label>
+                                                    <input type="text" class="control_input text-center" v-model="v_pol"
+                                                        list="mcp-pol-l">
+                                                    <datalist id="mcp-pol-l">
+                                                        <option v-for='w in v_list_w'>{{w}}</option>
+                                                    </datalist>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="header-right">
+                                            <div class="datp-div mt-2 mr-3">
+                                                <div class="d-flex justify-content-between">
+                                                    <label class="mr-2">1.Дата поступления</label>
+                                                    <input type="text" class="control_input text-center"
+                                                        v-model="v_datp">
+                                                </div>
+                                            </div>
+                                            <div class="tm_otd-div mt-2 mr-3">
+                                                <div class="d-flex justify-content-between">
+                                                    <label>Время</label>
+                                                    <input type="text" class="control_input text-center"
+                                                        v-model="v_tm_otd">
+                                                </div>
+                                            </div>
+                                            <div class="datv-div mt-2 mr-3">
+                                                <div class="d-flex justify-content-between">
+                                                    <label>2.Дата выписки</label>
+                                                    <input type="text" class="control_input text-center "
+                                                        v-model="v_datv">
+                                                </div>
+                                            </div>
+                                            <div class="datr-div mt-2 mr-3">
+                                                <div class="d-flex justify-content-between">
+                                                    <label>9.Дата рождения</label>
+                                                    <input type="text" class="control_input text-center"
+                                                        v-model="v_datr">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="med-card-pacienta mt-1">
+                                    <div v-show='pers_info' id="pers_info">
+                                        <h5>1.Персональные данные</h5>
+                                        <div class="d-flex ml-3">
+                                            <div id="otd-div">
+                                                <label class="pr-2">5.Выписан из отделения</label>
+                                                <input type="text" class="text-center control_input" list="otd-l"
+                                                    v-model="v_otd" @dblclick="v_otd=''">
+                                                <datalist id="otd-l">
+                                                    <option v-for="otde in v_list_otde">{{otde}}</option>
+                                                </datalist>
+                                            </div>
+                                            <div id="vec-div" class="ml-3">
+                                                <label class="pr-2">Вес при рождении(гр.)</label>
+                                                <input type="text" class="control_input text-center" v-model="v_vec">
+                                            </div>
+                                        </div>
+                                        <div id="m_roj-div" class="ml-3">
+                                            <label>12.Адрес регистрации</label>
+                                            <input type="text" class="control_input" v-model="v_m_roj"
+                                                data-toggle="modal" data-target="#staticAddress">
+                                        </div>
+                                        <div id="adr-div" class="ml-3">
+                                            <label>13.Адрес факт.прожив-я.</label>
+                                            <input type="text" class="control_input" v-model="v_adr">
+                                        </div>
+                                        <div class="d-flex ml-3">
+                                            <div id="rab-div">
+                                                <label>15.Место работы</label>
+                                                <input type="text" class="control_input" v-model="v_rab">
+                                            </div>
+                                            <div id="prof-div" class="ml-3">
+                                                <label>Профессия</label>
+                                                <input type="text" class="control_input" v-model="v_prof">
+                                            </div>
+                                        </div>
+                                        <div id="r_n-div" class="ml-3">
+                                            <label>16.Социальный статус</label>
+                                            <input type="text" class="control_input text-center" list="rab_ner-l"
+                                                v-model="v_r_n" @dblclick="v_r_n=''">
+                                            <datalist id="rab_ner-l">
+                                                <option v-for="rab_ner in v_list_rab_ner">{{rab_ner}}</option>
+                                            </datalist>
+                                        </div>
+                                        <div id="in_t-div" class="ml-3">
+                                            <label for="mcp-in_t" class="">17.Категория льготности</label>
+                                            <input type="text" class="control_input" list="in_t-l" v-model="v_in_t"
+                                                @dblclick="v_in_t=''">
+                                            <datalist id="in_t-l">
+                                                <option v-for="in_t in v_list_in_t">{{in_t}}</option>
+                                            </datalist>
+                                        </div>
+                                        <div id="lpu-div" class="ml-3">
+                                            <label>19.Кем направлен</label>
+                                            <input type="text" class="control_input" list="lpu-l" v-model="v_lpy"
+                                                @dblclick="v_lpy=''">
+                                            <datalist id="lpu-l">
+                                                <option v-for="lpu in v_list_lpu">{{lpu}}</option>
+                                            </datalist>
+                                        </div>
+                                        <div class="d-flex ml-3">
+                                            <div id="napr_n-div">
+                                                <label>№ Направления</label>
+                                                <input type="text" class="control_input">
+                                            </div>
+                                            <div id="napr_date-div" class="ml-3">
+                                                <label>Дата направления</label>
+                                                <input type="text" class="control_input" data-mask="00-00-0000">
+                                            </div>
+                                        </div>
+                                        <div id="op-div" class="ml-3">
+                                            <label for="" class="">22.Подозрение <br>на опьянение</label>
+                                            <input type="text" class="control_input text-center" list="mcp-op">
+                                            <datalist id=mcp-op>
+                                                <option>Нет</option>
+                                                <option>Алкогольное</option>
+                                                <option>Наркотическое</option>
+                                            </datalist>
+                                        </div>
+                                        <div class="d-flex ml-3">
+                                            <div id="goc-div">
+                                                <label>23.Госпитализация</label>
+                                                <input type="text" class="control_input text-center" list="goc-l"
+                                                    v-model="v_goc" @dblclick="v_goc=''">
+                                                <datalist id="goc-l">
+                                                    <option>Плановая</option>
+                                                    <option>Экстренная</option>
+                                                    <option>Неотложная</option>
+                                                </datalist>
+                                            </div>
+                                            <div id="prpg-div" class=" ml-3">
+                                                <label>Обращения</label>
+                                                <input type="text" class="control_input text-center" list="prpg-l"
+                                                    v-model="v_prpg" @dblclick="v_prpg=''">
+                                                <datalist id="prpg-l">
+                                                    <option>Первичная</option>
+                                                    <option>Повторная</option>
+                                                </datalist>
+                                            </div>
+                                        </div>
+                                        <div id="vrez-div" class="ml-3">
+                                            <label>Давностьзаболевания</label>
+                                            <input type="text" class="control_input text-center" list="list_vrez"
+                                                v-model="v_vrez" @dblclick="v_vrez=''">
+                                            <datalist id="list_vrez">
+                                                <option v-for="vrez in v_list_vrez">{{vrez}}</option>
+                                            </datalist>
+                                        </div>
+                                        <div id="postupleniya-div" class="ml-3">
+                                            <label>25.Признак поступления</label>
+                                            <input type="text" class="control_input text-center" list="postupleniya">
+                                            <datalist id="postupleniya">
+                                                <option>Самостоятельно</option>
+                                                <option>СМП</option>
+                                                <option>Перевод из ДР.ЛПУ</option>
+                                                <option>Перевод внутри МО</option>
+                                                <option>Полиция</option>
+                                            </datalist>
+                                        </div>
+                                    </div>
+                                    <div v-show='inf_diagnoses' id="inf_diagnoses">
+                                        <h5>2. Сведения о диагнозах</h5>
+                                        <div class="d-flex ml-3">
+                                            <label class="">26. Ds направив.учреждения.</label>
+                                            <div id="dsny-div">
+                                                <input type="text" class="control_input text-center"
+                                                    v-model='v_dsny_kod' @input="rec_list_ds(v_dsny_kod)" list="dsny-l"
+                                                    name="v_dsny_naim" onchange="get_name_ds(event)"
+                                                    @dblclick="v_dsny_kod='',v_dsny_naim=''"
+                                                    @keyup.enter="v_dsny_naim = rec_ds_naim(v_dsny_kod)">
+                                                <datalist id="dsny-l" v-if="v_list_ds != '' ">
+                                                    <option v-for="kod in v_list_ds">{{kod}}</option>
+                                                </datalist>
+                                            </div>
+                                            <div id="dsny_naim-div">
+                                                <input type="text" class="control_input" :value="v_dsny_naim" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex ml-3">
+                                            <div>
+                                                <label>27. Ds при поступлении.</label>
+                                                <input type="text" class="control_input text-center"
+                                                    style="height: 28px;margin-left: 18px;width: 196px;"
+                                                    v-model="v_ds_0_kod" @input="rec_list_ds(v_ds_0_kod)" list="ds_0-l"
+                                                    name="v_ds_0_naim" onchange="get_name_ds(event)"
+                                                    @dblclick="v_ds_0_kod='',v_ds_0_naim=''"
+                                                    @keyup.enter="v_ds_0_naim = rec_ds_naim(v_ds_0_kod)">
+                                                <datalist id="ds_0-l">
+                                                    <option v-for="kod in v_list_ds">{{kod}}</option>
+                                                </datalist>
+                                            </div>
+                                            <div>
+                                                <input type="text" class="control_input" :value="v_ds_0_naim" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex ml-3">
+                                            <div id="dsk_kod-div">
+                                                <label>29. Ds Клинический.</label>
+                                                <input type="text" class="control_input text-center" v-model='v_dsk_kod'
+                                                    @input="rec_list_ds(v_dsk_kod)" list="dsk_kod-l" name="v_dsk_naim"
+                                                    onchange="get_name_ds(event)" @dblclick="v_dsk_kod='',v_dsk_naim=''"
+                                                    @keyup.enter="v_dsk_naim = rec_ds_naim(v_dsk_kod)">
+                                                <datalist id="dsk_kod-l" v-if="v_list_ds != '' ">
+                                                    <option v-for="kod in v_list_ds">{{kod}}</option>
+                                                </datalist>
+                                            </div>
+                                            <div id="dsk_naim-div">
+                                                <input type="text" class="control_input" :value="v_dsk_naim" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex ml-3">
+                                            <div id="dskz_kod-div">
+                                                <label>30. Ds Клин.заключ.</label>
+                                                <input type="text" class="control_input text-center"
+                                                    v-model='v_dskz_kod' @input="rec_list_ds(v_dskz_kod)" list="dskz-l"
+                                                    name="v_dskz_naim" onchange="get_name_ds(event)"
+                                                    @dblclick="v_dskz_kod='',v_dskz_naim=''"
+                                                    @keyup.enter="v_dskz_naim = rec_ds_naim(v_dskz_kod)">
+                                                <datalist id="dskz-l" v-if="v_list_ds != '' ">
+                                                    <option v-for="kod in v_list_ds">{{kod}}</option>
+                                                </datalist>
+                                            </div>
+                                            <div id="dskz_naim-div">
+                                                <input type="text" class="control_input" :value="v_dskz_naim" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex ml-3">
+                                            <div id="ds_osl_kod-div">
+                                                <label>Ds осложнения.</label>
+                                                <input type="text" class="control_input text-center"
+                                                    v-model='v_ds_osl_kod' @input="rec_list_ds(v_ds_osl_kod)"
+                                                    list="osl_kod-l" name="v_ds_osl_naim" onchange="get_name_ds(event)"
+                                                    @dblclick="v_ds_osl_kod='',v_ds_osl_naim=''"
+                                                    @keyup.enter="v_ds_osl_naim = rec_ds_naim(v_ds_osl_kod)">
+                                                <datalist id="osl_kod-l" v-if="v_list_ds != '' ">
+                                                    <option v-for="kod in v_list_ds">{{kod}}</option>
+                                                </datalist>
+                                            </div>
+                                            <div id="ds_osl_naim-div">
+                                                <input type="text" class="control_input" :value="v_ds_osl_naim"
+                                                    disabled>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex ml-3">
+                                            <div id="dsc_kod-div">
+                                                <label>Ds сопутствующий.</label>
+                                                <input type="text" class="control_input text-center" v-model='v_dsc_kod'
+                                                    @input="rec_list_ds(v_dsc_kod)" list="dsc_kod-l" name="v_dsc_naim"
+                                                    onchange="get_name_ds(event)" @dblclick="v_dsc_kod='',v_dsc_naim=''"
+                                                    @keyup.enter="v_dsc_naim = rec_ds_naim(v_dsc_kod)">
+                                                <datalist id="dsc_kod-l" v-if="v_list_ds != '' ">
+                                                    <option v-for="kod in v_list_ds">{{kod}}</option>
+                                                </datalist>
+                                            </div>
+                                            <div id="dsc_naim-div">
+                                                <input type="text" class="control_input" :value="v_dsc_naim" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex ml-3">
+                                            <div id="dson_kod-div">
+                                                <label>Ds онкологий.</label>
+                                                <input type="text" class="control_input text-center"
+                                                    v-model='v_dson_kod' @input="rec_list_ds(v_dson_kod)"
+                                                    list="dson_kod-l" name="v_dson_naim" onchange="get_name_ds(event)"
+                                                    @dblclick="v_dson_kod='',v_dson_naim=''"
+                                                    @keyup.enter="v_dson_naim = rec_ds_naim(v_dson_kod)">
+                                                <datalist id="dson_kod-l" v-if="v_list_ds != '' ">
+                                                    <option v-for="kod in v_list_ds">{{kod}}</option>
+                                                </datalist>
+                                            </div>
+                                            <div id="dson_naim-div">
+                                                <input type="text" class="control_input" :value="v_dson_naim" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex ml-3">
+                                            <label>32. отметка о дате и времени
+                                                поступления из приемного отд.</label>
+                                            <input type="text" class="control_input"
+                                                style="height: 28px;width: 134px;margin-right: 13px;margin-left: 5px;">
+                                            <input type="text" class="control_input" style="height: 28px;width: 134px;">
+                                        </div>
+                                        <div id="icx-div" class="ml-3">
+                                            <label>44. Исход лечения.</label>
+                                            <input type="text" class="control_input text-center" list="v012_l"
+                                                v-model="v_icx" @dblclick="v_icx=''">
+                                            <datalist id="v012_l">
+                                                <option v-for='v12 in v_list_v012'>{{v12}}</option>
+                                            </datalist>
+                                        </div>
+                                        <div id="rez-div" class="ml-3">
+                                            <label>45. Результат лечения.</label>
+                                            <input type="text" class="control_input text-center" list="v009_l">
+                                            <datalist id="v009_l">
+                                                <option v-for='v09 in v_list_v009'>{{v09}}</option>
+                                            </datalist>
+                                        </div>
+                                    </div>
+                                    <div v-show='inf_koyko' style="width: 900px;overflow: scroll;">
+                                        <p>{{v_le_vr}}</p>
+                                        <table class="table table-bordered" id="koyko_table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Всего</th>
+                                                    <th>В АРО</th>
+                                                    <th>В профильном отделении</th>
+                                                    <th>По профилю койки</th>
+                                                    <th>Таб.№ врача</th>
+                                                    <th scope="col">Фамилия И.О лечащ.врача</th>
+                                                    <th scope="col">Специальность</th>
+                                                    <th scope="col">
+                                                        <button type="button" class="btn btn-outline-success" disabled
+                                                            onclick="Koyko_add()" id="add_tr_koyko">Добавить
+                                                            запись</button>
+
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- <tr v-if="v_le_vr != '' " onchange="Koyko_update()">
+                                                    <td>{{v_le_vr['N']}}</td>
+                                                    <td>{{v_le_vr['aro']}}</td>
+                                                    <td>{{v_le_vr['otd']}}</td>
+                                                    <td>{{v_le_vr['prof_k']}}</td>
+                                                    <td>
+                                                        {{v_le_vr['kod']}}</td>
+                                                    <td>{{v_le_vr['naim']}}</td>
+                                                    <td>
+                                                        {{v_le_vr['spec']}}
+                                                    </td>
+                                                    <td><input type="button" class="btn btn-danger"
+                                                            value="Удалить" onclick="Koyko_delete()"></td>
+                                                </tr> -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div v-show='inf_operation'
+                                        style="width: 900px;overflow: scroll;height: 400px;overflow: scroll">
+                                        <h5>36. Хирургическое лечение.</h5>
+                                        <p>{{v_oper}}</p>
+                                        <table class="table table-bordered" id="operation_table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Дата операции</th>
+                                                    <th scope="col">Время операции</th>
+                                                    <th scope="col" style="padding-right: 26px;">1-ПО<br>2-Стац</th>
+                                                    <th scope="col">Код операции</th>
+                                                    <th scope="col">Наименование</th>
+                                                    <th scope="col" style="padding-right:33px">3-ПЛ.<br>1-ЭК.</th>
+                                                    <th scope="col">Код хирурга</th>
+                                                    <th scope="col">ФИО</th>
+                                                    <th scope="col" style="padding-right: 47px;">Основ.опер</th>
+                                                    <th scope="col">Особ-ти операции</th>
+                                                    <th scope="col">К-во.биом</th>
+                                                    <th scope="col">1-Ассистент</th>
+                                                    <th scope="col">2-Ассистент</th>
+                                                    <th scope="col">Метод.обез-я</th>
+                                                    <th scope="col">Анестезиолог</th>
+                                                    <th scope="col">
+                                                        <button type="button" class="btn btn-outline-success"
+                                                            id="add_tr_operation" onclick="Oper_add()">Добавить
+                                                            запись</button>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div v-show='inf_ks_zabolev' id="inf_ks_zabolev">
+                                        <h5>КСГ заболевания</h5>
+                                        <div class="d-flex ml-3">
+                                            <div id="dskz_kod_ks-div">
+                                                <label>Ds Клин.заключ.</label>
+                                                <input type="text" class="control_input text-center"
+                                                    v-model='v_dskz_kod' disabled>
+                                            </div>
+                                            <div id="dskz_kod_ks-div">
+                                                <label>Ds сопут.</label>
+                                                <input type="text" class="control_input text-center" v-model='v_dsc_kod'
+                                                    disabled>
+                                            </div>
+                                            <div id="dskz_kod_ks-div">
+                                                <label>Операция осн.</label>
+                                                <input type="text" class="control_input text-center" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex ml-3">
+                                            <div id="ksg_osn-div">
+                                                <label>1.N КСГ осн.заболевания - </label>
+                                                <input type="text" class="control_input" v-model="ksg_osn"
+                                                    style="width: 182px;" list="t006_l">
+                                                <datalist id="t006_l">
+                                                    <option v-for='t06 in v_list_t006'>{{t06}}</option>
+                                                </datalist>
+                                            </div>
+                                            <div id="dskz_kod_os-div">
+                                                <label>Ds осн.заболевания для СМО - </label>
+                                                <input type="text" class="control_input text-center"
+                                                    v-model='v_dskz_kod' style="width: 182px;" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex ml-3">
+                                            <label>3.Медицинская помощь в стационаре оказана не в полном объеме по
+                                                приячине ранее проведенных услуг в установленных сроки
+                                            </label>
+                                            <input type="text" class="control_input" style="height: 30px;width: 182px;">
+                                        </div>
+                                        <div class="d-flex ml-3">
+                                            <div id="ksg_sop-div">
+                                                <label>4.N КСГ сопут.заболевания - </label>
+                                                <input type="text" class="control_input" v-model="ksg_sop"
+                                                    style="width: 182px;" list="t006">
+                                                <datalist id="t006">
+                                                    <option v-for='t in v_list_t006'>{{t}}</option>
+                                                </datalist>
+                                            </div>
+                                            <div id="iddoc-div">
+                                                <label>5.Таб.N врача для ОМС - </label>
+                                                <input type="text" class="control_input" v-model="iddoc"
+                                                    style="width: 182px;" list="vra-l">
+                                                <datalist id="vra-l">
+                                                    <option v-for='v in v_list_vra'>{{v}}</option>
+                                                </datalist>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-show="inf_complication" id="inf_complication"
+                                        style="width: 900px;overflow: scroll;height: 400px;overflow: scroll">
+                                        <h5>осложнения</h5>
+                                        <p>{{v_complication}}</p>
+                                        <table class="table table-bordered" id="complication_table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col" style="padding-left: 75px;padding-right: 75px;">
+                                                        Дата операции/Код операции</th>
+                                                    <th scope="col">Таб.N</th>
+                                                    <th scope="col">ФИО</th>
+                                                    <th scope="col">Дата осложнения</th>
+                                                    <th scope="col">Код осложнения</th>
+                                                    <th scope="col">Осложнение</th>
+                                                    <th scope="col" style="padding-left: 85px;padding-right: 85px;">
+                                                        Характер осл.</th>
+                                                    <th scope="col" style="padding-left: 55px;padding-right: 55px;">
+                                                        Причина</th>
+                                                    <th scope="col" style="padding-left: 60px;padding-right: 60px;">
+                                                        Экспертиза</th>
+                                                    <th scope="col">
+                                                        <button type="button" class="btn btn-outline-success"
+                                                            id="add_tr_complication"
+                                                            onclick="add_complication()">Добавить
+                                                            запись</button>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div v-show="inf_work_capacity" id="inf_work_capacity">
+
+                                        <div class="center" style="margin-left: 25%;margin-right: 25%;" id="Trs">
+                                            <p>{{v_trs}}</p>
+                                            <h5 class="text-center">Трудоспособность</h5>
+                                            <div class="form-group form-check">
+                                                <input class="form-check-input" type="radio" name="capacity"
+                                                    id="exampleCheck1">
+                                                <label class="form-check-label"
+                                                    for="exampleCheck1">Восстановлена</label>
+                                            </div>
+                                            <div class="form-group form-check">
+                                                <input class="form-check-input" type="radio" name="capacity"
+                                                    id="exampleCheck3">
+                                                <label class="form-check-label" for="exampleCheck3">Временно
+                                                    утрачена</label>
+                                            </div>
+                                            <div class="form-group form-check">
+                                                <input class="form-check-input" type="radio" name="capacity"
+                                                    id="exampleCheck4">
+                                                <label class="form-check-label" for="exampleCheck4">Стойко утрачена в
+                                                    связи с данным заболеванием</label>
+                                            </div>
+                                            <div class="form-group form-check">
+                                                <input class="form-check-input" type="radio" name="capacity"
+                                                    id="exampleCheck5">
+                                                <label class="form-check-label" for="exampleCheck5">Стойко утрачена по
+                                                    другим причинам</label>
+                                            </div>
+                                            <div class="form-group form-check">
+                                                <input class="form-check-input" type="radio" name="capacity"
+                                                    id="exampleCheck6">
+                                                <label class="form-check-label" for="exampleCheck6">Направлен на
+                                                    МСЭ</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-show="inf_manipulation" id="inf_manipulation"
+                                        style="width: 900px;overflow: scroll;height: 400px;overflow: scroll">
+                                        <h5>Манипуляции</h5>
+                                        p{{v_manipulation}}
+                                        <table class="table table-bordered" id="manipulation_table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Дата выполнения</th>
+                                                    <th scope="col">Таб.N врача</th>
+                                                    <th scope="col">Фамилия врача</th>
+                                                    <th scope="col">Код Манипуляции</th>
+                                                    <th scope="col">Наименование</th>
+                                                    <th scope="col">К-во</th>
+                                                    <th scope="col">Плат.Услуга</th>
+                                                    <th scope="col">
+                                                        <button type="button" class="btn btn-outline-success"
+                                                            id="add_tr_manipulation"
+                                                            onclick="add_manipulation()">Добавить
+                                                            запись</button>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div v-show="inf_translations" id="inf_translations">
+                                        <h5>Переводы</h5>
+                                        <div class="d-flex  ml-3">
+
+                                            <div>
+                                                <h6>Переводы из Др.Отделения</h6>
+                                                <div class="ml-3">
+                                                    <label>Перевод из Отд.</label>
+                                                    <input type="text" class="text-center control_input"
+                                                        list="otd_old-l" v-model="v_potd">
+                                                    <datalist id="otd_old-l">
+                                                        <option v-for="otde in v_list_otde">{{otde}}</option>
+                                                    </datalist>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <label>Дата перевода</label>
+                                                    <input type="text" class="control_input" v-model="v_dat_pe">
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h6>Перевод в Др.ЛПУ</h6>
+                                                <div class="ml-3">
+                                                    <label>Перевод в Др.ЛПУ</label>
+                                                    <input type="text" class="control_input" list="lpu-l"
+                                                        v-model="v_kod_y">
+                                                    <datalist id="lpu-l">
+                                                        <option v-for="lpu in v_list_lpu">{{lpu}}</option>
+                                                    </datalist>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <label>Причина перевода</label>
+                                                    <input type="text" class="control_input" v-model="v_pr_per"
+                                                        list="pr_per-l">
+                                                    <datalist id="pr_per-l">
+                                                        <option>для оказания специализированной мед.помощи</option>
+                                                        <option>для прохождения реабилитации</option>
+                                                        <option>для следующего этапа лечения</option>
+                                                    </datalist>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-show="inf_post_mortem" id="inf_post_mortem">
+                                        <div class="ml-3">
+                                            <label style="padding-right: 53px">Время смерти (час.мин)</label>
+                                            <input type="text" class="control_input text-center" v-model="v_tm_let">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Код причины летального исхода</label>
+                                            <input type="text" class="control_input text-center" list="pril-l"
+                                                v-model="v_pri" style="width: 406px">
+                                            <datalist id="pril-l">
+                                                <option v-for="prli in v_list_prli">{{prli}}</option>
+                                            </datalist>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label style="padding-right: 7px;">Ds причины летального исхода</label>
+                                            <input type="text" class="control_input text-center" v-model='v_ds_let'
+                                                @input="rec_list_ds(v_ds_let)" list="ds_let-l" name="v_ds_let"
+                                                onchange="get_name_ds(event)" @dblclick="v_ds_let='',v_ds_let_naim=''"
+                                                @keyup.enter="v_ds_let_naim = rec_ds_naim(v_ds_let)">
+                                            <datalist id="ds_let-l" v-if="v_list_ds != '' ">
+                                                <option v-for="kod in v_list_ds">{{kod}}</option>
+                                            </datalist>
+                                            <label>{{v_ds_let_naim}}</label>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label style="padding-right: 148px;">Вскрытие</label>
+                                            <input type="text" class="control_input text-center" v-model="v_wskr"
+                                                list="wskr-l">
+                                            <datalist id="wskr-l">
+                                                <option>без вскрытия</option>
+                                                <option>патологоанатом.</option>
+                                                <option>судебное</option>
+                                            </datalist>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label style="padding-right: 33px;">Ds паталогоанатомический</label>
+                                            <input type="text" class="control_input text-center" v-model='v_dspat'
+                                                @input="rec_list_ds(v_dspat)" list="dspat-l" name="v_dspat"
+                                                onchange="get_name_ds(event)" @dblclick="v_dspat='',v_dspat_naim=''"
+                                                @keyup.enter="v_dspat_naim = rec_ds_naim(v_dspat)">
+                                            <datalist id="dspat-l" v-if="v_list_ds != '' ">
+                                                <option v-for="kod in v_list_ds">{{kod}}</option>
+                                            </datalist>
+                                            <label>{{v_dspat_naim}}</label>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label style="padding-right: 16px;">Расхождение Ds установлено</label>
+                                            <input type="text" class="control_input text-center" list="rasxp-l"
+                                                v-model="v_rasxp">
+                                            <datalist id="rasxp-l">
+                                                <option>Да</option>
+                                                <option>Нет</option>
+                                            </datalist>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label style="padding-right: 165px;">Умер в</label>
+                                            <input type="text" class="control_input text-center" v-model="v_otd_y"
+                                                list="otd_y-l" style="width: 306px;">
+                                            <datalist id="otd_y-l">
+                                                <option v-for="otde in v_list_otde">{{otde}}</option>
+                                            </datalist>
+                                        </div>
+
+
+                                    </div>
+                                    <div v-show="inf_injury" id="inf_injury">
+                                        <h5>33 Сведения о травме</h5>
+                                        <div class="ml-3">
+                                            <label>Характер травмы</label>
+                                            <input type="text" class="control_input text-center" v-model='v_dskz_kod'
+                                                @input="rec_list_ds(v_dskz_kod)" list="dskz-l" name="v_dskz_naim"
+                                                onchange="get_name_ds(event)" @dblclick="v_dskz_kod='',v_dskz_naim=''"
+                                                @keyup.enter="v_dskz_naim = rec_ds_naim(v_dskz_kod)">
+                                            <datalist id="dskz-l" v-if="v_list_ds != '' ">
+                                                <option v-for="kod in v_list_ds">{{kod}}</option>
+                                            </datalist>
+                                            <label>{{v_dskz_naim}}</label>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Внешние причины травмы</label>
+                                            <!-- {{v_details}}
+                                            {{v_details_name}} -->
+                                            <input type="text" class="control_input text-center" v-model='v_details'
+                                                @input="rec_list_ds(v_details)" list="details-l" name="v_details"
+                                                onchange="get_name_ds(event)" @dblclick="v_details='',v_details_name=''"
+                                                @keyup.enter="v_details_name = rec_ds_naim(v_details)">
+                                            <datalist id="details-l">
+                                                <option v-for="kod in v_list_ds">{{kod}}</option>
+                                            </datalist>
+                                            <label>{{v_details_name}}</label>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label style="width: 356px;">Тип травмы</label>
+                                            <input type="text" class="control_input text-center" v-model='v_t_trv'
+                                                list="trv-l">
+                                            <datalist id="trv-l">
+                                                <option v-for="kod in v_list_trv">{{kod}}</option>
+                                            </datalist>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>34.Травма получена в рез-те противоправных действий третьих
+                                                лиц</label>
+                                            <input type="text" class="control_input text-center" list="trav_ns-l"
+                                                v-model="v_trav_ns">
+                                            <datalist id="trav_ns-l">
+                                                <option>Да</option>
+                                                <option>Нет</option>
+                                            </datalist>
+                                        </div>
+                                    </div>
+                                    <div v-show="inf_policy_passport_snills" id="inf_policy_passport_snills">
+                                        <h5>Полис/Документ/Снилс</h5>
+                                        <div class="ml-3">
+                                            <label>Источник оплаты</label>
+                                            <input type="text" class="control_input" v-model="v_vds" list="vds-l"
+                                                style="width: 256px;">
+                                            <datalist id="vds-l">
+                                                <option v-for="isfin in v_list_isfin">{{isfin}}</option>
+                                            </datalist>
+                                        </div>
+                                        <div class="d-flex ml-3">
+                                            <div>
+                                                <label class="pr-2" style="padding-right: 15px;">Сер.полиса</label>
+                                                <input type="text" class="text-center control_input" v-model="v_sctp">
+
+                                            </div>
+                                            <div class="ml-3">
+                                                <label class="pr-2">N полиса</label>
+                                                <input type="text" class="control_input text-center" v-model="v_nctp">
+                                            </div>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label style="padding-right: 76px;">СМО</label>
+                                            <input type="text" class="control_input text-center" v-model="v_ctkom"
+                                                list="ctkom-l" style="width: 356px;">
+                                            <datalist id="ctkom-l">
+                                                <option v-for="skom in v_list_skom">{{skom}}</option>
+                                            </datalist>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label style="padding-right: 35px;">Тип полиса</label>
+                                            <input type="text" class="control_input text-center" v-model="v_t_pol"
+                                                list="t_pol-l" style="width: 356px;">
+                                            <datalist id="t_pol-l">
+                                                <option v-for="f008 in v_list_f008">{{f008}}</option>
+                                            </datalist>
+                                        </div>
+                                        <h6>Документ,Удостоверяющий Личность</h6>
+                                        <div class="ml-3">
+                                            <label>Тип документа</label>
+                                            <input type="text" class="control_input text-center" v-model="v_udl"
+                                                list="udl-l">
+                                            <datalist id="udl-l">
+                                                <option v-for="f011 in v_list_f011">{{f011}}</option>
+                                            </datalist>
+                                        </div>
+                                        <div class="d-flex ml-3">
+                                            <div>
+                                                <label class="pr-2">Сер.ДУЛ</label>
+                                                <input type="text" class="text-center control_input" v-model="v_s_pasp">
+
+                                            </div>
+                                            <div class="ml-3">
+                                                <label class="pr-2">N ДУЛ</label>
+                                                <input type="text" class="control_input text-center" v-model="v_n_pasp">
+                                            </div>
+                                            <div class="ml-3">
+                                                <label class="pr-2">Дата выдачи</label>
+                                                <input type="text" class="control_input text-center"
+                                                    v-model="v_docdate">
+                                            </div>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label style="padding-right: 37px;">Кем выдан</label>
+                                            <input type="text" class="control_input text-center" v-model="v_docorg"
+                                                style="width: 561px;">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Место рождения</label>
+                                            <input type="text" class="control_input text-center" v-model="v_m_roj"
+                                                style="width: 561px;">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label style="padding-right: 66px;">Снилс</label>
+                                            <input type="text" class="control_input text-center" v-model="v_ss">
+                                        </div>
+
+                                    </div>
+                                    <div v-show="inf_pregnancy" id="inf_pregnancy">
+                                        <h5>Сведения о беременности</h5>
+                                        <div class="ml-3">
+                                            <label>Дата</label>
+                                            <input type="text" class="control_input text-center" v-model="v_vb_a_datv">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Срок беременности (недель)</label>
+                                            <input type="text" class="control_input text-center" v-model="v_srber">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Настоящая беременность по счету</label>
+                                            <input type="text" class="control_input text-center" v-model="v_n_ber">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Причины прерывания беременности</label>
+                                            <input type="text" class="control_input text-center" v-model="v_pria"
+                                                list="pria-l">
+                                            <datalist id="pria-l">
+                                                <option>медицинские показания</option>
+                                                <option>социальные показания</option>
+                                                <option>легальный медицинский</option>
+                                                <option>патология развития плода</option>
+                                            </datalist>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Метод прерывания беременности</label>
+                                            <input type="text" class="control_input text-center" v-model="v_m_prer"
+                                                list="m_prer-l">
+                                            <datalist id="m_prer-l">
+                                                <option>оперативный</option>
+                                                <option>медикаментозный</option>
+                                                <option>вакуум-аспирация</option>
+                                                <option>другой</option>
+                                            </datalist>
+                                        </div>
+                                    </div>
+                                    <div v-show="inf_disability" id="inf_disability">
+                                        <h5 class="text-center">Лист нетрудоспособности</h5>
+                                        <div class="d-flex ml-3">
+                                            <div>
+                                                <label class="pr-2">Открыт с</label>
+                                                <input type="text" class="text-center control_input" v-model="v_dat_l1">
+                                            </div>
+                                            <div class="ml-3">
+                                                <label class="pr-2">по</label>
+                                                <input type="text" class="control_input text-center" v-model="v_dat_l2">
+                                            </div>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Закрыт</label>
+                                            <input type="text" class="control_input text-center" v-model="v_ot_ln">
+                                        </div>
+                                        <h5 class="text-center">По уходу за больным</h5>
+                                        <div class="d-flex ml-3">
+                                            <div>
+                                                <label class="pr-2">Полных лет</label>
+                                                <input type="text" class="text-center control_input" v-model="v_vs_bol">
+                                            </div>
+                                            <div class="ml-3">
+                                                <label class="pr-2">пол</label>
+                                                <input type="text" class="control_input text-center"
+                                                    v-model="v_dis_sex_bol">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-show="inf_patient_p" id="inf_patient_p">
+                                        <h5>Представитель пациента</h5>
+                                        <div class="ml-3">
+                                            <label>Фамилия</label>
+                                            <input type="text" class="control_input text-center" v-model="v_fam_p">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Имя</label>
+                                            <input type="text" class="control_input text-center" v-model="v_im_p">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Отчество</label>
+                                            <input type="text" class="control_input text-center" v-model="v_ot_p">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Пол</label>
+                                            <input type="text" class="control_input text-center" v-model="v_sex_bol"
+                                                list="sex_bol-l">
+                                            <datalist id="sex_bol-l">
+                                                <option v-for='w in v_list_w'>{{w}}</option>
+                                            </datalist>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Место рождения</label>
+                                            <input type="text" class="control_input text-center" v-model="v_mp_roj">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Тип документа</label>
+                                            <input type="text" class="control_input text-center" v-model="v_udl_p"
+                                                list="udl_p-l">
+                                            <datalist id="udl_p-l">
+                                                <option v-for="f011 in v_list_f011">{{f011}}</option>
+                                            </datalist>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Серия</label>
+                                            <input type="text" class="control_input text-center" v-model="v_sp_pasp">
+                                            <label>Номер</label>
+                                            <input type="text" class="control_input text-center" v-model="v_np_pasp">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>СМО</label>
+                                            <input type="text" class="control_input text-center" v-model="v_skom_p"
+                                                list="skom_p-l">
+                                            <datalist id="skom_p-l">
+                                                <option v-for="skom in v_list_skom">{{skom}}</option>
+                                            </datalist>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Тип полиса</label>
+                                            <input type="text" class="control_input text-center" v-model="v_stat_p"
+                                                list="stat_p-l">
+                                            <datalist id="stat_p-l">
+                                                <option v-for="f008 in v_list_f008">{{f008}}</option>
+                                            </datalist>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Сер.полиса</label>
+                                            <input type="text" class="control_input text-center" v-model="v_s_pol">
+                                            <label>N.полиса</label>
+                                            <input type="text" class="control_input text-center" v-model="v_n_pol">
+                                        </div>
+                                    </div>
+                                    <div v-show="inf_address" id="inf_address">
+                                        <h5>Адрес проживания</h5>
+                                        <div class="ml-3">
+                                            <label class="pr-2">Гражданство</label>
+                                            <input type="text" class="control_input text-center">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label class="pr-2">Регион</label>
+                                            <input type="text" class="control_input text-center">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label class="pr-2">Район</label>
+                                            <input type="text" class="control_input text-center">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label class="pr-2">Город</label>
+                                            <input type="text" class="control_input text-center">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label class="pr-2">Нас.пункт</label>
+                                            <input type="text" class="control_input text-center">
+                                        </div>
+                                        <div class="d-flex ml-3">
+                                            <div>
+                                                <label class="pr-2">Дом</label>
+                                                <input type="text" class="text-center control_input">
+                                            </div>
+                                            <div class="ml-3">
+                                                <label class="pr-2">Кв.</label>
+                                                <input type="text" class="control_input text-center">
+                                            </div>
+                                            <div class="ml-3">
+                                                <label class="pr-2">Корпус</label>
+                                                <input type="text" class="control_input text-center">
+                                            </div>
+                                            <div class="ml-3">
+                                                <label class="pr-2">Строение</label>
+                                                <input type="text" class="control_input text-center">
+                                            </div>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label class="pr-2">Категория</label>
+                                            <input type="text" class="control_input text-center">
+                                        </div>
+
+                                        <div class="wrapp_ex">
+                                            <div class="hold_ex" id="form_with_map">
+                                                <div class="form_ex js-form-address-map">
+                                                    <div class="input_hold">
+                                                        <div class="label">Индекс</div>
+                                                        <div class="input">
+                                                            <div class="input_text" style="display:none">
+                                                                <span id="map_zip"></span>
+                                                                <small>определен автоматически</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="input_hold">
+                                                        <label class="label">Область</label>
+                                                        <div class="input">
+                                                            <input type="text" name="region">
+                                                        </div>
+                                                    </div>
+                                                    <div class="input_hold">
+                                                        <label class="label">Регион / район</label>
+                                                        <div class="input">
+                                                            <input type="text" name="district">
+                                                        </div>
+                                                    </div>
+                                                    <div class="input_hold">
+                                                        <label class="label">Город / н. п.</label>
+                                                        <div class="input">
+                                                            <input type="text" name="city" value="">
+                                                        </div>
+                                                    </div>
+                                                    <div class="input_hold">
+                                                        <label class="label">Улица</label>
+                                                        <div class="input">
+                                                            <input type="text" name="street" value="">
+                                                        </div>
+                                                    </div>
+                                                    <div class="input_hold">
+                                                        <label class="label">Дом</label>
+                                                        <div class="input input_small">
+                                                            <input type="text" name="building" value="">
+                                                        </div>
+                                                    </div>
+                                                    <div class="input_hold">
+                                                        <label class="label"></label>
+                                                        <div class="input input_small">
+                                                            <a href="#" id="js-form-address-map-clear"
+                                                                style="display: none">Сбросить форму</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="more_info">
+                                                    <div class="morinfo_title">
+                                                        Дополнительная информация:
+                                                    </div>
+                                                    <dl id="address_mor" class="more_info_oneline"></dl>
+                                                    <dl>
+                                                        <dt>Код КЛАДР</dt>
+                                                        <dd id="kladrId" class="empty-field-filler">&nbsp;</dd>
+                                                    </dl>
+                                                    <dl>
+                                                        <dt>Код ФИАС</dt>
+                                                        <dd id="guid" class="empty-field-filler">&nbsp;</dd>
+                                                    </dl>
+                                                    <dl>
+                                                        <dt>Код ОКАТО</dt>
+                                                        <dd id="okatoId" class="empty-field-filler">&nbsp;</dd>
+                                                    </dl>
+                                                    <dl>
+                                                        <dt>Код ОКТМО</dt>
+                                                        <dd id="oktmo" class="empty-field-filler">&nbsp;</dd>
+                                                    </dl>
+                                                    <dl>
+                                                        <dt>Код налоговой</dt>
+                                                        <dd id="ifns" class="empty-field-filler">&nbsp;</dd>
+                                                    </dl>
+                                                    <dl>
+                                                        <dt>Подпись</dt>
+                                                        <dd id="typeId" class="empty-field-filler">&nbsp;</dd>
+                                                    </dl>
+                                                    <dl>
+                                                        <dt>Подпись коротко</dt>
+                                                        <dd id="typeShortId" class="empty-field-filler">&nbsp;</dd>
+                                                    </dl>
+                                                    <dl>
+                                                        <dt>Тип объекта</dt>
+                                                        <dd id="contentTypeId" class="empty-field-filler">&nbsp;</dd>
+                                                    </dl>
+                                                    </dl>
+                                                    <dl>
+                                                        <dt>Кадастровый номер</dt>
+                                                        <dd id="cadnum" class="empty-field-filler">&nbsp;</dd>
+                                                    </dl>
+                                                </div>
+                                            </div>
+                                            <div id="map" class="map_ex"></div>
+                                        </div>
+
+                                    </div>
+                                    <div v-show="inf_onmk" id="inf_onmk">
+                                        <h5>Карта больного с ОНМК</h5>
+                                    </div>
+                                    <div v-show="inf_onk" id="inf_onk" style="height: 500px;overflow: scroll;">
+                                        <h5>Карта онкобольного</h5>
+                                        <div class="ml-3">
+                                            <label>Повод обращения</label>
+                                            <input type="text" class="control_input text-center" list="n018-l"
+                                                v-model="v_ds1_t">
+                                            <datalist id="n018-l">
+                                                <option v-for="n018 in v_list_n018">{{n018}}</option>
+                                            </datalist>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Стадия заболевания</label>
+                                            <input type="text" class="control_input text-center" v-model="v_stad">
+                                        </div>
+                                        <div class="d-flex ml-3">
+                                            <label>Стадия по TNM</label>
+                                            <div>
+                                                <label>T</label>
+                                                <input type="text" class="control_input text-center" v-model="v_onk_t">
+                                            </div>
+                                            <div>
+                                                <label>N</label>
+                                                <input type="text" class="control_input text-center" v-model="v_onk_n">
+                                            </div>
+                                            <div>
+                                                <label>M</label>
+                                                <input type="text" class="control_input text-center" v-model="v_onk_m">
+                                            </div>
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Наличие отдельных метастазов</label>
+                                            <input type="text" class="control_input text-center" v-model="v_mtstz">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Характер заболевания</label>
+                                            <input type="text" class="control_input text-center" v-model="v_c_zab">
+                                        </div>
+                                        <h5>Сведения о диагностике</h5>
+                                        <div class="ml-3">
+                                            <label>Дата взятия материала</label>
+                                            <input type="text" class="control_input text-center" v-model="v_diag_date">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Тип диагностического показателя</label>
+                                            <input type="text" class="control_input text-center" v-model="v_diag_tip">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Код диагностического показателя</label>
+                                            <input type="text" class="control_input text-center" v-model="v_diag_code">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Код результата диагностики</label>
+                                            <input type="text" class="control_input text-center" v-model="v_diag_rslt">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Признак получения результата диагностики</label>
+                                            <input type="text" class="control_input text-center" v-model="v_rec_rslt">
+                                        </div>
+                                        <h5>Сведения о проведении консилиума</h5>
+                                        <div class="ml-3">
+                                            <label>Дата консилиума</label>
+                                            <input type="text" class="control_input text-center" v-model="v_dt_cons">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Цель консилиума</label>
+                                            <input type="text" class="control_input text-center" v-model="v_pr_cons">
+                                        </div>
+                                        <h5>Сведения об услуге лечения</h5>
+                                        <div class="ml-3">
+                                            <label>Тип услуги</label>
+                                            <input type="text" class="control_input text-center" v-model="v_usl_tip">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Тип хирургического лечения</label>
+                                            <input type="text" class="control_input text-center" v-model="v_hir_tip">
+                                        </div>
+                                        <h5>Сведения о противопоказаниях и отказах</h5>
+                                        <div class="ml-3">
+                                            <label>Дата регистрации</label>
+                                            <input type="text" class="control_input text-center" v-model="v_d_prot">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>противопоказания и отказы</label>
+                                            <input type="text" class="control_input text-center" v-model="v_prot">
+                                        </div>
+                                        <h5>Сведения о направлений в МО (из выписного эпикриза)</h5>
+                                        <div class="ml-3">
+                                            <label>Дата направления</label>
+                                            <input type="text" class="control_input text-center" v-model="v_naprdate">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Вид направления</label>
+                                            <input type="text" class="control_input text-center" v-model="v_napr_v">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Мо,куда рекомендовано обращаться</label>
+                                            <input type="text" class="control_input text-center" v-model="v_napr_mo">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Метод диагностич.исследования</label>
+                                            <input type="text" class="control_input text-center" v-model="v_napr_issl">
+                                        </div>
+                                        <div class="ml-3">
+                                            <label>Мед.услуга(код) рекомендованная</label>
+                                            <input type="text" class="control_input text-center" v-model="v_napr_usl">
+                                        </div>
+                                    </div>
+                                    <div v-show="inf_mo" id="inf_mo">
+                                        <h5>Мо прикрепления</h5>
+                                        <div class="ml-3 text-center">
+                                            <input type="text" class="control_input text-center" v-model="v_pmg">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="med-card-menu">
+                                <div class="med-card-menu-inc">
+                                    <div class="med-card-menu-inc-list">
+                                        <div class="list-group" id="med_card_menu">
+                                            <a class="list-group-item list-group-item-action active" id="list-home-list"
+                                                data-toggle="list" role="tab" aria-controls="1.Персональные данные"
+                                                @click.prevent='default_temp(),pers_info=true'>1.Персональные
+                                                данные</a>
+                                            <a class="list-group-item list-group-item-action" id="list-profile-list"
+                                                data-toggle="list" role="tab" aria-controls="2.Сведения о диагнозах"
+                                                @click.prevent='default_temp(),inf_diagnoses=true'>2.Сведения
+                                                о диагнозах</a>
+                                            <a class="list-group-item list-group-item-action" id="list-profile-list"
+                                                data-toggle="list" role="tab" aria-controls="3.Койко-дни"
+                                                @click.prevent='default_temp(),inf_koyko=true'
+                                                onclick="Koyko_edit()">3.Койко-дни</a>
+
+                                            <a class="list-group-item list-group-item-action" id="list-profile-list"
+                                                data-toggle="list" role="tab" aria-controls="4.Операции"
+                                                @click.prevent='default_temp(),inf_operation=true'
+                                                onclick="Oper_edit()">4.Операции</a>
+
+                                            <a class="list-group-item list-group-item-action" id="list-profile-list"
+                                                data-toggle="list" role="tab"
+                                                aria-controls="5.Клинико-стат.гр.заболев-я"
+                                                @click.prevent='default_temp(),inf_ks_zabolev=true'>5.Клинико-стат.гр.заболев-я</a>
+
+                                            <a class="list-group-item list-group-item-action" id="list-profile-list"
+                                                data-toggle="list" role="tab" aria-controls="6.Oсложнение"
+                                                @click.prevent='default_temp(),inf_complication=true'
+                                                onclick="Complication_edit()">6.Oсложнение</a>
+
+                                            <a class="list-group-item list-group-item-action" id="list-profile-list"
+                                                data-toggle="list" role="tab" aria-controls="7.Трудоспособность"
+                                                @click.prevent='default_temp(),inf_work_capacity=true'
+                                                onclick="Select_trs()">7.Трудоспособность</a>
+
+                                            <a class="list-group-item list-group-item-action" id="list-profile-list"
+                                                data-toggle="list" role="tab" aria-controls="8.Манипуляции"
+                                                @click.prevent='default_temp(),inf_manipulation=true'
+                                                onclick="Manipulation_edit()">8.Манипуляции</a>
+
+                                            <a class="list-group-item list-group-item-action" id="list-profile-list"
+                                                data-toggle="list" role="tab" aria-controls="9.Переводы"
+                                                @click.prevent='default_temp(),inf_translations=true'>9.Переводы</a>
+                                            <!-- disabled -->
+                                            <a class="list-group-item list-group-item-action" id="list-profile-list"
+                                                data-toggle="list" role="tab" aria-controls="А.Патанатомический Ds"
+                                                @click.prevent='default_temp(),inf_post_mortem=true'>А.Патанатомический
+                                                Ds</a>
+
+                                            <a class="list-group-item list-group-item-action" id="list-profile-list"
+                                                data-toggle="list" role="tab" aria-controls="B.Сведения о травмах"
+                                                @click.prevent='default_temp(),inf_injury=true'>B.Сведения о травмах</a>
+
+                                            <a class="list-group-item list-group-item-action" id="list-profile-list"
+                                                data-toggle="list" role="tab" aria-controls="C.Полис/паспорт/СНИЛС"
+                                                @click.prevent='default_temp(),inf_policy_passport_snills=true'>C.Полис/Документ/Снилс</a>
+
+                                            <a class="list-group-item list-group-item-action" id="list-profile-list"
+                                                data-toggle="list" role="tab" aria-controls="D.Прерывание беременности"
+                                                @click.prevent='default_temp(),inf_pregnancy=true'>D.Прерывание
+                                                беременности</a>
+
+                                            <a class="list-group-item list-group-item-action" id="list-profile-list"
+                                                data-toggle="list" role="tab" aria-controls="E.Лист нетрудоспособности"
+                                                @click.prevent="default_temp(),inf_disability=true">E.Лист
+                                                нетрудоспособности</a>
+
+                                            <a class="list-group-item list-group-item-action" id="list-profile-list"
+                                                data-toggle="list" role="tab" aria-controls="F.Представитель пациента"
+                                                @click.prevent="default_temp(),inf_patient_p=true">F.Представитель
+                                                пациента</a>
+
+                                            <a class="list-group-item list-group-item-action" id="list-profile-list"
+                                                role="tab" data-toggle="modal" data-target="#staticAddress">G.Адрес
+                                                проживания</a>
+                                            <!-- <input type="text"
+                                                data-toggle="modal" data-target="#staticAddress"> -->
+
+                                            <a class="list-group-item list-group-item-action" id="list-profile-list"
+                                                data-toggle="list" role="tab" aria-controls="I.Карта больного с ОНМК"
+                                                @click.prevent="default_temp(),inf_onmk=true">I.Карта больного с
+                                                ОНМК</a>
+
+                                            <a class="list-group-item list-group-item-action" id="list-profile-list"
+                                                data-toggle="list" role="tab" aria-controls="J.Карта онкобольного"
+                                                @click.prevent="default_temp(),inf_onk=true">J.Карта
+                                                онкобольного</a>
+
+                                            <a class="list-group-item list-group-item-action" id="list-profile-list"
+                                                data-toggle="list" role="tab" aria-controls="K.Мо прикрепления"
+                                                @click.prevent="default_temp(),inf_mo=true">K.Мо
+                                                прикрепления</a>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal"
+                                onclick="Clear()">Отмена</button>
+                            <button type="button" class="btn btn-success">Сохранить изменения</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal_adr">
+            <div class="modal fade" id="staticAddress" data-backdrop="static" data-keyboard="false" tabindex="-1"
+                role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">Адрес проживания</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="c_oksm">
+                                <label>Гражданство</label>
+                                <input type="text" class="control_input text-center" name="c_oksm" v-model="v_c_oksm"
+                                    list="oksm-l">
+                                <datalist id="oksm-l">
+                                    <option v-for="oksm in v_list_oksm">{{oksm}}</option>
+                                </datalist>
+                            </div>
+
+                            <div id="adr">
+                                <label>Адрес</label>
+                                <input name="address" type="text" class="text-center control_input" v-model="v_m_roj"
+                                    style="width: 600px;" onchange="mod_adr()">
+                            </div>
+                            <div id="adr_kv_kp_st">
+                                <label>Кв</label>
+                                <input type="text" class="text-center control_input" v-model="v_kv">
+                                <label>Корпус</label>
+                                <input type="text" class="text-center control_input" v-model="v_kp">
+                                <label>Строение</label>
+                                <input type="text" class="text-center control_input" v-model="v_stro">
+                            </div>
+                            <div>
+                                <label>Тип</label>
+                                <input type="text" class="text-center control_input" v-model="v_cj" list="cj-l">
+                                <datalist id="cj-l">
+                                    <option>Городской</option>
+                                    <option>Сельский</option>
+                                </datalist>
+                            </div>
+                            <div>
+                                <label>Администрат.округ</label>
+                                <input type="text" class="text-center control_input" v-model="v_rai" list="rai-l">
+                                <datalist id="rai-l">
+                                    <option>Центральный АО</option>
+                                    <option>Ленинский АО</option>
+                                    <option>Калининский АО</option>
+                                    <option>Восточный АО</option>
+                                </datalist>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Отмена</button>
+                            <button type="button" class="btn btn-success" onclick="mod_adr()"
+                                data-dismiss="modal">Сохранить изменения</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    {% endverbatim %}
+
+    {% endblock %}

@@ -1,0 +1,105 @@
+{% extends 'base_hospital_index.html' %}
+{% block content %}
+
+
+<div class="form-signin">
+  <div class="index-menu">
+     <h1 class="h3 mb-3 font-weight-normal">Стационар</h1>
+     <ul class="menu-li">
+
+         <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#exampleModalCenter">Загрузка из 1С</button>
+         <a href="search/" style="text-decoration:none"><button type="button" class="btn btn-outline-primary">Просмотр/Редактирование записей</button></a>
+         <button type="button" class="btn btn-outline-primary">Создание отчетов</button>
+         <a href="/" style="text-decoration:none"><button type="button" class="btn btn-outline-primary" v-on:click="exit_end">Выход</button></a>
+       
+     </ul>
+ </div>
+</div>
+
+
+<div id="app">
+  {% verbatim %}
+  <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+  <div class="modal-content">
+      <div class="modal-header">
+          
+          
+            <h5 class="modal-title" id="exampleModalLongTitle">{{message}}</h5>
+      
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+        <form id="uploadForm-load-1c" method="POST" enctype="multipart/form-data">
+              <!-- {% csrf_token %} -->
+          
+          <div v-if="mes_div" class="alert alert-success" role="alert">
+            Файлы загружены
+          </div>
+
+          <div v-if=" mes_div!=null && !mes_div" class="alert alert-danger" role="alert">
+            Файлы не загружены
+          </div>
+
+          <div v-show="loader_sp" class="alert alert-success" role="alert">
+            Файлы обрабатываются
+          </div>
+
+          <div v-if="loader_sp_end" class="alert alert-success" role="alert">
+            Записи записаны успешно
+          </div>
+
+          <div v-if="err_oper" class="alert alert-danger" role="alert">
+            Вы загрузили не файл oper
+          </div>
+
+          <div v-if="err_sluch" class="alert alert-danger" role="alert">
+            Вы загрузили не файл sluch
+          </div>
+
+          
+
+          <div class="modal-body">
+
+              <div class="form-group">
+                  <label for="file_oper">Выберите файл oper</label>
+                  <input v-model="oper" type="file" class="form-control-file" id="file_oper">
+              </div>
+      
+              <div class="form-group">
+                  <label for="file_sluch">Выберите файл sluch</label>
+                  <input v-model="sluch" type="file" class="form-control-file" id="file_sluch">
+
+              </div>
+      
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal" id="btn-e">Закрыть</button>
+            <button type="button" class="btn btn-primary"   v-on:click="uploadFiles" id="btn-s" >Сохранить</button>
+          </div>
+          
+
+          <div v-show="loader_sp" class="container_loader">
+            <div class="📦"></div>
+            <div class="📦"></div>
+            <div class="📦"></div>
+            <div class="📦"></div>
+            <div class="📦"></div>
+          </div>
+
+          <!-- <pre>
+            {{$data}}
+          </pre> -->
+        
+          {% endverbatim %}
+          </form>
+          
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
